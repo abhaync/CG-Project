@@ -4,6 +4,7 @@
 #include <GL/glu.h>
 #include <stdlib.h>
 
+//int version = glutGet(GLUT_VERSION);
 //int windowHeight = glutGet(GLUT_SCREEN_HEIGHT);
 //int windowWidth = glutGet(GLUT_SCREEN_WIDTH);
 
@@ -56,7 +57,10 @@ int main(int argc, char *argv[]) {
 	glutInitWindowSize(500,500);
 	glutInitWindowPosition(0,0);
 	initialize();
-	glutFullScreen();
+	int screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
+	int screenWidth = glutGet(GLUT_SCREEN_WIDTH);
+	printf("%d is screen height\n%d is screen Width\n",screenHeight,screenWidth);
+	//glutFullScreen();
 	glutDisplayFunc(display);
 	glutMouseFunc(mouseClicked);
 	//glutKeyboardFunc(keyPressed);
