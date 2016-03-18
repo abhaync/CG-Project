@@ -1,5 +1,7 @@
 #include "include/functions.h"
 #include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
