@@ -1,4 +1,5 @@
 #include "include/functions.h"
+#include "include/src/SOIL.h"
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -22,10 +23,51 @@ void initialize() {
 	gluOrtho2D(0.0, (float)(screenWidth - 1), 0.0, (float)(screenHeight -1));
 }
 
+GLuint loadAndDisplayImage(const char *filename, int width, int height) {
+	unsigned char *data;
+    FILE *file;
+ 
+    puts(filename);
+    // open texture data
+    file = fopen(filename, "r");
+    if (file == NULL) return 0;
+ 
+    // allocate buffer
+    data = (unsigned char*) malloc(width * height * 4);
+ 
+    //read texture data
+    fread(data, width * height * 4, 1, file);
+    fclose(file);
+	GLuint textureBufferId;
+	textureBufferId = SOIL_load_OGL_texture // load an image file directly as a new OpenGL texture
+    (
+        "img_test.bmp",
+        SOIL_LOAD_AUTO,
+        SOIL_CREATE_NEW_ID,
+        SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+    );
+    if (textureBufferId == 0) {
+    	printf("Loading image error\n %s", SOIL_last_result());
+    }
+
+	glGenTextures(1, &textureBufferId);
+	glBindTexture(GL_TEXTURE_2D, textureBufferId);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0,GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	return textureBufferId;
+}
+
 void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glPointSize(100.0);
-	glColor3f(1.0, 1.0, 1.0);
+	// glPointSize(100.0);
+	GLuint id = loadAndDisplayImage("img_test.bmp", 256, 256);
+	glEnable(GL_TEXTURE_2D);
+	// glColor3f(1.0, 1.0, 1.0);
 	
 	glRasterPos2i(((screenWidth / 2) - strlen(title)), screenHeight - 100);
 	for (int i = 0; i < strlen(title); ++i) {
