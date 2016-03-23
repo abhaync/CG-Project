@@ -28,7 +28,7 @@ void renderMenu() {
 	midY = (midY + midY - 1) / 2;
 	int margin = 30;
 	printf("X: %f Y: %f\n", midX, midY);
-	glColor3f(1.0, 1.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
 	// Play button Begin
 	glBegin(GL_QUADS);
 		glVertex2f(midX - 245, midY + 50);
@@ -36,14 +36,14 @@ void renderMenu() {
 		glVertex2f(midX - 145, midY - 50);
 		glVertex2f(midX - 145, midY + 50);
 	glEnd();
-	glColor3f(1.0, 0.0, 0.0);
+	glColor3f(0.0, 0.0, 0.0);
 	glBegin(GL_TRIANGLES);
 		glVertex2f(midX - 170, midY);
 		glVertex2f(midX - 220, midY + 25);
 		glVertex2f(midX - 220, midY - 25);
 	glEnd();
 	// Play Button End
-	glColor3f(1.0, 1.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
 	// High Score Button Begin
 	glBegin(GL_QUADS);
 		glVertex2f(midX - 115, midY + 50);
@@ -51,7 +51,7 @@ void renderMenu() {
 		glVertex2f(midX - 15, midY - 50);
 		glVertex2f(midX - 15, midY + 50);
 	glEnd();
-	glColor3f(1.0, 0.0, 0.0);
+	glColor3f(0.0, 0.0, 0.0);
 	glLineWidth(10.0);
 	glBegin(GL_LINES);
 		glVertex2f(midX - 100, midY);
@@ -70,7 +70,7 @@ void renderMenu() {
 		glVertex2f(midX - 25, midY - 20);
 	glEnd();
 	// High Scores Button End
-	glColor3f(1.0, 1.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
 
 	glBegin(GL_QUADS);
 		glVertex2f(midX + 115, midY + 50);
