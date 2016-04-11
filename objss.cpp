@@ -30,8 +30,8 @@
  
 using namespace std;
 float norm[3];
-GLint f=0,g=0;
- 
+GLfloat f=0,g=0;
+bool* keyStates = new bool[256]; 
 /************************************************************************
   Window
  ************************************************************************/
@@ -229,12 +229,24 @@ glEnableClientState(GL_VERTEX_ARRAY);						// Enable vertex arrays
 Model_OBJ obj,obj1;
 float g_rotation;
 glutWindow win;
+
+void keyOperations()
+{
+	if(keyStates['a'])
+		f-=0.2;
+	if(keyStates['d'])
+		f+=0.2;
+	if(keyStates['j'])
+		g-=0.2;
+	if(keyStates['l'])
+		g+=0.2;
+}
  
 void display() 
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	
+	keyOperations();
 	glPushMatrix();
 		gluLookAt( 12,-1,40, 0,0,0, 0,1,0);
 		glRotatef(45,0,1,0);
@@ -297,33 +309,23 @@ void initialize ()
  
 void keyboard ( unsigned char key, int x, int y ) 
 {
-  switch ( key ) {
-    case KEY_ESCAPE:        
-      exit ( 0 );   
-      break;
-    case 'a':
-	f-=2;
-	break;
-    case 'd':
-	f+=2;
-	break;
-    case 'j':
-	g-=2;
-	break;
-    case 'l':
-	g+=2;
-	break;
-    default:      
-      break;
-  }
+  if(key == KEY_ESCAPE)
+	exit(0);
+  else
+	keyStates[key] = true;
   //glutPostRedisplay();
+}
+
+void keyboardup ( unsigned char key, int x, int y )
+{
+	keyStates[key] = false;
 }
 
 void idle()
 {
 	glutPostRedisplay();
 }
- 
+
 int main(int argc, char **argv) 
 {
 	// set window values
@@ -341,7 +343,8 @@ int main(int argc, char **argv)
 	glutCreateWindow(win.title);								// create Window
 	glutDisplayFunc(display);									// register Display Function
 	glutIdleFunc(idle);									// register Idle Function
-    glutKeyboardFunc( keyboard );								// register Keyboard Handler
+        glutKeyboardFunc( keyboard );
+	glutKeyboardUpFunc( keyboardup );								// register Keyboard Handler
 	initialize();
 	obj.Load("absship.obj");
 	obj1.Load("absship.obj");
