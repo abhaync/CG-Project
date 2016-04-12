@@ -4,6 +4,7 @@
 #include <GL/glu.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 int screenHeight = 0;
 int screenWidth = 0;
@@ -114,8 +115,26 @@ void display() {
  *
  */
 void mouseClicked(int btn, int state, int x, int y) {
-	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+	float midX = screenWidth / 2;
+	midX = (midX + midX - 1) / 2;
+	float midY = screenHeight / 2;
+	midY = (midY + midY - 1) / 2;
+	int xMin = midX - 245; 
+	int xMax = midX - 145;
+	int yMin = midY - 50;
+	int yMax = midY + 50;
+	printf("x is :%d and y is :%d\n", x, y);
+	if ((btn == 'q' || btn == 'Q') && state == GLUT_UP) {
 		exit(0);
+	} else if(x > xMin && x < xMax && y > yMin && y < yMax && btn == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		// Play button is clicked
+		pid_t gamePid;
+		if ((gamePid = fork()) < 0) {
+			printf("Game could not be launched.\n");
+		} else if(gamePid == 0) {
+			printf("Game successfully launched.\n");
+			system("");
+		}
 	}
 }
 
