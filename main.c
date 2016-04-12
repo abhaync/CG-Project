@@ -1,4 +1,4 @@
-#include "include/functions.h"
+#include <stdio.h>
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -133,7 +133,9 @@ void mouseClicked(int btn, int state, int x, int y) {
 			printf("Game could not be launched.\n");
 		} else if(gamePid == 0) {
 			printf("Game successfully launched.\n");
-			system("");
+			system("g++ objss.cpp -lglut -lGL -lGLU -o game && ./game");
+		} else {
+			exit(0);
 		}
 	}
 }
