@@ -1,4 +1,4 @@
-#include "include/functions.h"
+#include <stdio.h>
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -20,6 +20,33 @@ char *names = "Abhay & Sandeep";
 void initialize() {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	gluOrtho2D(0.0, (float)(screenWidth - 1), 0.0, (float)(screenHeight -1));
+}
+
+void loadBackgroundImage(char *image) {
+	char *imageData;
+	FILE *file;
+	int width = screenWidth;
+	int height = screenHeight;
+	file = fopen(image, "r");
+	imageData = (unsigned char*) malloc(width * height * 24);
+	int imageSize = width * height * 24;
+	fread(imageData, width * height * 4, 1, file);
+	fclose(file);
+	 /*
+	 * TGA is stored in BGR (Blue-Green-Red) format,
+	 * we need to convert this to Red-Green-Blue (RGB).
+	 * The following section does BGR to RGB conversion
+	 */
+	for (int i = 0; i < imageSize; i+=3) {
+		// 24 bits per pixel   =  3 byte per pixel
+		char c = imageData[i];
+		imageData[i] = imageData[i+2];
+		imageData[i+2] = c;
+	}
+	glRasterPos2i(0,0);
+	glPixelStorei (GL_UNPACK_ROW_LENGTH, width);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, imageData);
 }
 
 void renderMenu() {
@@ -91,6 +118,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	// glPointSize(100.0);
 	glEnable(GL_TEXTURE_2D);
+	loadBackgroundImage("background.tga");
 	glColor3f(1.0, 1.0, 1.0);
 	glRasterPos2i(((screenWidth / 2) - strlen(title)), screenHeight - 100);
 	for (int i = 0; i < strlen(title); i++) {
@@ -133,7 +161,9 @@ void mouseClicked(int btn, int state, int x, int y) {
 			printf("Game could not be launched.\n");
 		} else if(gamePid == 0) {
 			printf("Game successfully launched.\n");
-			system("");
+			system("g++ objss.cpp -lglut -lGL -lGLU -o game && ./game");
+		} else {
+			exit(0);
 		}
 	}
 }
