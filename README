@@ -1,0 +1,2 @@
+Compile using gcc -o output water-tex.c texture.c
+
