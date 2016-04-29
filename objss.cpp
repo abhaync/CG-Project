@@ -247,6 +247,8 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	keyOperations();
+	glColor3f(1.0, 0.0, 0.0);
+
 	glPushMatrix();
 		gluLookAt( 12,-1,40, 0,0,0, 0,1,0);
 		glRotatef(45,0,1,0);
@@ -258,6 +260,8 @@ void display()
 		obj.Draw();
 		
 	glPopMatrix();
+	glColor3f(0.0, 1.0, 1.0);
+
 	glPushMatrix();
 		gluLookAt( 15,1,40, 0,0,0, 0,1,0);
 		glRotatef(45,0,1,0);
@@ -284,7 +288,7 @@ void initialize ()
 	gluPerspective(win.field_of_view_angle, aspect, win.z_near, win.z_far);
     glMatrixMode(GL_MODELVIEW);
     glShadeModel( GL_SMOOTH );
-    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+    glClearColor( 0.0f, 0.133f, 0.444f, 1.0f );
     glClearDepth( 1.0f );
     glEnable( GL_DEPTH_TEST );
     glDepthFunc( GL_LEQUAL );
