@@ -25,12 +25,16 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include "water-tex.h"
+
  
 #define KEY_ESCAPE 27
+
+ int displayFlag = 0;
  
 using namespace std;
 float norm[3];
-GLfloat f=0,g=0;
+GLfloat fa=0,g=0;
 bool* keyStates = new bool[256]; 
 /************************************************************************
   Window
@@ -233,9 +237,9 @@ glutWindow win;
 void keyOperations()
 {
 	if(keyStates['a'])
-		f-=0.2;
+		fa-=0.2;
 	if(keyStates['d'])
-		f+=0.2;
+		fa+=0.2;
 	if(keyStates['j'])
 		g-=0.2;
 	if(keyStates['l'])
@@ -272,14 +276,51 @@ void loadBackgroundImage(char *image) {
 void display() 
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	// glLoadIdentity();
+	glLoadIdentity();
 	keyOperations();
+	int i, j, tmp;
+	float tx, ty;
+	float texd = (float)1/WATERSIZE;		/* for texture mapping */
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glPushMatrix();
-		gluLookAt(15, 78, 300, 0, 0, 0, 0, 1, 0);
-		glTranslatef(-205, -164, -10);
-		loadBackgroundImage("water.tga");
+	glTranslatef(0, 0, spin_z-110);
+	glRotatef(spin_x, 0, 1, 0);
+	glRotatef(spin_y-60, 1, 0, 0);
+
+	calcwater();
+	glBegin(GL_TRIANGLES);
+	for(i = 0; i < WATERSIZE-1; i++) {
+		for(j = 0; j < WATERSIZE-1; j++) {
+			tx = (float)j/WATERSIZE;
+			ty = (float)i/WATERSIZE;
+			//texd = (float)1/WATERSIZE;
+
+			glTexCoord2f(tx, ty); 
+			glVertex3f(j-WATERSIZE/2, i-WATERSIZE/2, water[t][j][i]);
+			glTexCoord2f(tx+texd, ty); 
+			glVertex3f(j+1-WATERSIZE/2, i-WATERSIZE/2, water[t][j+1][i]);
+			glTexCoord2f(tx+texd, ty+texd); 
+			glVertex3f(j+1-WATERSIZE/2, i+1-WATERSIZE/2, water[t][j+1][i+1]);
+
+			glTexCoord2f(tx, ty+texd); 
+			glVertex3f(j-WATERSIZE/2, i+1-WATERSIZE/2, water[t][j][i+1]);
+			glTexCoord2f(tx, ty); 
+			glVertex3f(j-WATERSIZE/2, i-WATERSIZE/2, water[t][j][i]);
+			glTexCoord2f(tx+texd, ty+texd); 
+			glVertex3f(j+1-WATERSIZE/2, i+1-WATERSIZE/2, water[t][j+1][i+1]);
+
+		}
+	}
+	glEnd();
+
+	tmp = t; t = f; f = tmp;
+
+
 	glPopMatrix();
+
+
 	glColor3f(0.0, 1.0, 0.0);
 	glPushMatrix();
 		gluLookAt(15, 98, 300, 0, 0, 0, 0, 1, 0);
@@ -321,13 +362,15 @@ void display()
 		glRotatef(90,0,1,0);
 		glTranslatef(0,6,6);
 		glScalef(0.5,0.5,0.5);
-		glTranslatef(0,0,f);
+		glTranslatef(0,0,fa);
 	//	g_rotation++;
 		obj1.Draw();
 		
 		
 	glPopMatrix();
 	glutSwapBuffers();
+	glFlush();
+
 }
  
  
@@ -378,10 +421,10 @@ void keyboardup ( unsigned char key, int x, int y )
 	keyStates[key] = false;
 }
 
-void idle()
-{
-	glutPostRedisplay();
-}
+// void idle()
+// {
+// 	glutPostRedisplay();
+// }
 
 int main(int argc, char **argv) 
 {
@@ -399,9 +442,10 @@ int main(int argc, char **argv)
 	glutInitWindowSize(win.width,win.height);					// set window size
 	glutCreateWindow(win.title);								// create Window
 	glutDisplayFunc(display);									// register Display Function
-	glutIdleFunc(idle);									// register Idle Function
+	// glutIdleFunc(idle);									// register Idle Function
         glutKeyboardFunc( keyboard );
 	glutKeyboardUpFunc( keyboardup );								// register Keyboard Handler
+	LoadTexture();
 	initialize();
 	obj.Load("absship.obj");
 	obj1.Load("absship.obj");
