@@ -324,7 +324,7 @@ void display()
 	glColor3f(0.0, 1.0, 0.0);
 	glPushMatrix();
 		gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 0);
-		glTranslatef(-10, 67, -10);
+		glTranslatef(0, 67, -10);
 		glBegin(GL_QUADS);
 			glVertex2f(0, 0);
 			glVertex2f(75, 0);
@@ -348,10 +348,10 @@ void display()
 	glColor3f(1, 0, 0);
 	glPushMatrix();
 		gluLookAt( 0,0,100, 0,0,0, 0,1,0);
-		glRotatef(45,0,1,0);
 		glRotatef(90,0,1,0);
+		// glRotatef(90,0,1,0);
 		glTranslatef(0,-5,-5);
-		glScalef(0.5,0.5,0.5);
+		glScalef(2, 2, 2);
 		glTranslatef(0,0,g);
 	//	g_rotation++;
 		obj.Draw();
@@ -363,8 +363,8 @@ void display()
 		gluLookAt( 15,1,40, 0,0,0, 0,1,0);
 		glRotatef(45,0,1,0);
 		glRotatef(90,0,1,0);
-		glTranslatef(0,6,6);
-		glScalef(0.5,0.5,0.5);
+		glTranslatef(0,10,6);
+		glScalef(0.8,0.8,0.8);
 		glTranslatef(0,0,fa);
 	//	g_rotation++;
 		obj1.Draw();
