@@ -323,28 +323,31 @@ void display()
 
 	glColor3f(0.0, 1.0, 0.0);
 	glPushMatrix();
-		gluLookAt(15, 98, 300, 0, 0, 0, 0, 1, 0);
-		glTranslatef(-150, 100, -10);
+		gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 0);
+		glTranslatef(-180, 0, -10);
 		glBegin(GL_QUADS);
 			glVertex2f(0, 0);
 			glVertex2f(200, 0);
-			glVertex2f(200, 10);
+			glVertex2f(l200, 10);
 			glVertex2f(0, 10);
 		glEnd();
 	glPopMatrix();
 	glPushMatrix();
-		gluLookAt(15, -52, 300, 0, 0, 0, 0, 1, 0);
-		glTranslatef(-150, -100, -10);
+		gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 0);
+		glTranslatef(-180,60, 0);
 		glBegin(GL_QUADS);
 			glVertex2f(0, 0);
 			glVertex2f(200, 0);
 			glVertex2f(200, 10);
 			glVertex2f(0, 10);
 		glEnd();
+		/*glTranslatef(30.0,0.0,75.0);
+		glScalef(10.0,0.25,0.0);
+		glutWireCube(2.0);*/
 	glPopMatrix();
 	glColor3f(1, 0, 0);
 	glPushMatrix();
-		gluLookAt( 15,-1,40, 0,0,0, 0,1,0);
+		gluLookAt( 0,0,100, 0,0,0, 0,1,0);
 		glRotatef(45,0,1,0);
 		glRotatef(90,0,1,0);
 		glTranslatef(0,-5,-5);
@@ -381,7 +384,8 @@ void initialize ()
 	GLfloat aspect = (GLfloat) win.width / win.height;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-	gluPerspective(win.field_of_view_angle, aspect, win.z_near, win.z_far);
+	glFrustum(-1.0,1.0,-1.0,1.0,1.0,500.0);
+	//gluPerspective(win.field_of_view_angle, aspect, win.z_near, win.z_far);
     glMatrixMode(GL_MODELVIEW);
     glShadeModel( GL_SMOOTH );
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
