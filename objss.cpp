@@ -35,6 +35,7 @@
 using namespace std;
 float norm[3];
 GLfloat fa=0,g=0,ga=0,fb=0;
+float f1 = 0;
 bool* keyStates = new bool[256]; 
 void fire_b1();
 void fire_b2();
@@ -260,11 +261,13 @@ void keyOperations()
 	}
 	if(keyStates['w'])
 	{
+
 		fire_b1();
 	}
 	if(keyStates['i'])
 	{
 		fire_b2();
+		f1+=0.3;
 	}
 }
 
@@ -433,23 +436,33 @@ void fire_b1()
 
 void fire_b2()
 {
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
-	glPushMatrix();
-		gluLookAt(0,0,100,0,0,0,0,1,0);
-		//glTranslatef(-1,5,0);
-		glRotatef(90,0,1,0);
-		glColor3f(1.0,0.0,0.0);
-		glBegin(GL_POINTS);
-			glVertex3f(0,0, 0);
-			//glVertex3f(0,7, 0);
-			//glVertex3f(0,7, 25);
-			//glVertex3f(0,0, 25);
-		glEnd();
-		glPointSize(5.0);
-	glPopMatrix();
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);	
+	if(f1 >= 10)
+	{
+		keyStates['i'] = false;
+		f1 = 0;
+	}
+	else
+	{	
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+		// int i=0,j=0,k=0;
+		glPushMatrix();	
+			gluLookAt(0,0,100,0,0,0,0,1,0);
+			// for(f1=0;f1<10;f1+=0.1)
+			glTranslatef(-10,-5+f1,-f1);
+			glRotatef(90,0,1,0);
+			glColor3f(1.0,0.0,0.0);
+			glBegin(GL_POINTS);
+				glVertex3f(0,0, 0);
+				//glVertex3f(0,7, 0);
+				//glVertex3f(0,7, 25);
+				//glVertex3f(0,0, 25);
+			glEnd();
+			glPointSize(5.0);
+		glPopMatrix();
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+	}	
 }
  
 void initialize () 
