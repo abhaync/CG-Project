@@ -151,17 +151,26 @@ void mouseClicked(int btn, int state, int x, int y) {
 	int xMax = midX - 145;
 	int yMin = midY - 50;
 	int yMax = midY + 50;
+	char playerName[50] = "Player 1";
+	char message[100] = "Enter player name in the teminal window";
+	glRasterPos2i(((screenWidth / 2) - strlen(title)), screenHeight - 100);
+	for (int i = 0; i < strlen(title); i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, title[i]);
+	}
 	printf("x is :%d and y is :%d\n", x, y);
-	if ((btn == 'q' || btn == 'Q') && state == GLUT_UP) {
-		exit(0);
-	} else if(x > xMin && x < xMax && y > yMin && y < yMax && btn == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+	if(x > xMin && x < xMax && y > yMin && y < yMax && btn == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		// Play button is clicked
 		pid_t gamePid;
+		printf("Enter Player name:   ");
+		scanf("%s",playerName);
+		char cmd[100] = "g++ objss.cpp -lglut -lGL -lGLU -o game && ./game ";
+		strcat(cmd, playerName);
 		if ((gamePid = fork()) < 0) {
 			printf("Game could not be launched.\n");
 		} else if(gamePid == 0) {
-			printf("Game successfully launched.\n");
-			system("g++ objss.cpp -lglut -lGL -lGLU -o game && ./game");
+			printf("Game successfully compiled.\n");
+			system(cmd);
+			printf("Successfully executed:  %s\n", cmd);
 		} else {
 			exit(0);
 		}
