@@ -34,8 +34,10 @@
  
 using namespace std;
 float norm[3];
-GLfloat fa=0,g=0;
+GLfloat fa=0,g=0,ga=0,fb=0;
 bool* keyStates = new bool[256]; 
+void fire_b1();
+void fire_b2();
 /************************************************************************
   Window
  ************************************************************************/
@@ -237,13 +239,33 @@ glutWindow win;
 void keyOperations()
 {
 	if(keyStates['a'])
+	{
 		fa-=0.2;
+		fb-=0.222;
+	}
 	if(keyStates['d'])
+	{
 		fa+=0.2;
+		fb+=0.222;
+	}	
 	if(keyStates['j'])
+	{
 		g-=0.2;
+		ga-=0.275;
+	}
 	if(keyStates['l'])
+	{
 		g+=0.2;
+		ga+=0.275;
+	}
+	if(keyStates['w'])
+	{
+		fire_b1();
+	}
+	if(keyStates['i'])
+	{
+		fire_b2();
+	}
 }
 
 void loadBackgroundImage(char *image) {
@@ -277,7 +299,6 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	keyOperations();
 	int i, j, tmp;
 	float tx, ty;
 	float texd = (float)1/WATERSIZE;		/* for texture mapping */
@@ -320,7 +341,7 @@ void display()
 
 	glPopMatrix();
 
-
+	keyOperations();
 	glColor3f(0.0, 1.0, 0.0);
 	glPushMatrix();
 		gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 0);
@@ -345,6 +366,18 @@ void display()
 		glScalef(10.0,0.25,0.0);
 		glutWireCube(2.0);*/
 	glPopMatrix();
+	glColor3f(0.0,1.0,0.0);
+	glPushMatrix();
+		gluLookAt(0,0,50,0,0,0,0,1,0);
+		glTranslatef(-24+ga,-11,-5);
+		glRotatef(90,0,1,0);
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(0,0, 0);
+			glVertex3f(0,8, 0);
+			glVertex3f(0,8, 30);
+			glVertex3f(0,0, 30);
+		glEnd();
+	glPopMatrix();	
 	glColor3f(1, 0, 0);
 	glPushMatrix();
 		gluLookAt( 0,0,100, 0,0,0, 0,1,0);
@@ -357,14 +390,26 @@ void display()
 		obj.Draw();
 		
 	glPopMatrix();
-	glColor3f(0.0, 1.0, 1.0);
-
+	glColor3f(1,0,0);
 	glPushMatrix();
-		gluLookAt( 15,1,40, 0,0,0, 0,1,0);
-		glRotatef(45,0,1,0);
+		gluLookAt(0,0,100,0,0,0,0,1,0);
+		glTranslatef(-10+fb,5,0);
+		glRotatef(90,0,1,0);
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(0,0, 0);
+			glVertex3f(0,7, 0);
+			glVertex3f(0,7, 25);
+			glVertex3f(0,0, 25);
+		glEnd();
+	glPopMatrix();	
+		
+	glColor3f(0.0, 1.0, 1.0);
+	glPushMatrix();
+		gluLookAt( 0,0,100, 0,0,0, 0,1,0);
+		//glRotatef(30,0,1,0);
 		glRotatef(90,0,1,0);
 		glTranslatef(0,10,6);
-		glScalef(0.8,0.8,0.8);
+		glScalef(1,1,1);
 		glTranslatef(0,0,fa);
 	//	g_rotation++;
 		obj1.Draw();
@@ -375,7 +420,37 @@ void display()
 	glFlush();
 
 }
- 
+
+void fire_b1()
+{
+	glColor3f(1.0,0.0,0.0);
+	glPushMatrix();
+		//gluLookAt(0,0,300,0,0,0,0,1,0);
+		glScalef(0.5,0.5,0.5);
+		glutSolidSphere(1,100,100);
+	glPopMatrix();
+} 
+
+void fire_b2()
+{
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+	glPushMatrix();
+		gluLookAt(0,0,100,0,0,0,0,1,0);
+		//glTranslatef(-1,5,0);
+		glRotatef(90,0,1,0);
+		glColor3f(1.0,0.0,0.0);
+		glBegin(GL_POINTS);
+			glVertex3f(0,0, 0);
+			//glVertex3f(0,7, 0);
+			//glVertex3f(0,7, 25);
+			//glVertex3f(0,0, 25);
+		glEnd();
+		glPointSize(5.0);
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);	
+}
  
 void initialize () 
 {
@@ -422,7 +497,10 @@ void keyboard ( unsigned char key, int x, int y )
 
 void keyboardup ( unsigned char key, int x, int y )
 {
-	keyStates[key] = false;
+	if(key == 'w' || key == 'i')
+		keyStates[key] = true;
+	else
+		keyStates[key] = false;
 }
 
 /*void idle()
