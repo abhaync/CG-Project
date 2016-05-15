@@ -39,6 +39,30 @@ float f1 = 0;
 bool* keyStates = new bool[256]; 
 void fire_b1();
 void fire_b2();
+
+typedef struct bullet
+{
+	bool spawn;
+	float spx,spy;
+};
+
+bool is_spawn(bullet *b)
+{
+	if(b->spawn)
+		return true;
+	else
+		return false;
+}
+
+bullet* create_bullet(float posx, float posy)
+{
+	bullet *bul;
+	bul = new (bullet);
+	bul->spx = posx;
+	bul->spy = posy;
+	bul->spawn = true;
+	return bul;
+}
 /************************************************************************
   Window
  ************************************************************************/
@@ -267,7 +291,7 @@ void keyOperations()
 	if(keyStates['i'])
 	{
 		fire_b2();
-		f1+=0.3;
+		//f1+=0.3;
 	}
 }
 
@@ -429,40 +453,80 @@ void fire_b1()
 	glColor3f(1.0,0.0,0.0);
 	glPushMatrix();
 		//gluLookAt(0,0,300,0,0,0,0,1,0);
-		glScalef(0.5,0.5,0.5);
+		glScalef(0.05,0.05,0.05);
 		glutSolidSphere(1,100,100);
 	glPopMatrix();
 } 
 
 void fire_b2()
 {
-	if(f1 >= 10)
+	bullet *b2 = create_bullet(-5+g,-5);
+	if(!is_spawn(b2))
 	{
-		keyStates['i'] = false;
-		f1 = 0;
+		printf("%f\n",f1 );
+		if(f1 >= 5)
+		{
+			keyStates['i'] = false;
+			f1 = 0;
+		}
+		else
+		{
+			f1 += 0.3;
+		}
+
 	}
 	else
-	{	
+	{
 		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-		// int i=0,j=0,k=0;
-		glPushMatrix();	
-			gluLookAt(0,0,100,0,0,0,0,1,0);
-			// for(f1=0;f1<10;f1+=0.1)
-			glTranslatef(-10,-5+f1,-f1);
-			glRotatef(90,0,1,0);
+	 	glDisable(GL_LIGHT0);
+	 	glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		glTranslatef(-10,-5+f1,-f1);
+	 		glRotatef(90,0,1,0);
 			glColor3f(1.0,0.0,0.0);
-			glBegin(GL_POINTS);
-				glVertex3f(0,0, 0);
-				//glVertex3f(0,7, 0);
-				//glVertex3f(0,7, 25);
-				//glVertex3f(0,0, 25);
+	 		glBegin(GL_POINTS);
+				glVertex3f(0,b2->spx,b2->spy);
 			glEnd();
 			glPointSize(5.0);
 		glPopMatrix();
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}	
+		b2->spawn = false;
+	}
+	glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		//glRotatef(90,0,1,0);
+	 		
+
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	// if(f1 >= 10)
+	// {
+	// 	keyStates['i'] = false;
+	// 	f1 = 0;
+	// }
+	// else
+	// {	
+	// 	glDisable(GL_LIGHTING);
+	// 	glDisable(GL_LIGHT0);
+	// 	// int i=0,j=0,k=0;
+	// 	glPushMatrix();	
+	// 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	// 		// for(f1=0;f1<10;f1+=0.1)
+	// 		glTranslatef(-10,-5+f1,-f1);
+	// 		glRotatef(90,0,1,0);
+	// 		glColor3f(1.0,0.0,0.0);
+	// 		glBegin(GL_POINTS);
+	// 			glVertex3f(0,0, 0+g);
+	// 			//glVertex3f(0,7, 0);
+	// 			//glVertex3f(0,7, 25);
+	// 			//glVertex3f(0,0, 25);
+	// 		glEnd();
+	// 		glPointSize(5.0);
+	// 	glPopMatrix();
+	// 	glEnable(GL_LIGHTING);
+	// 	glEnable(GL_LIGHT0);
+	// }	
+
 }
  
 void initialize () 
