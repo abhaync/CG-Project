@@ -37,7 +37,7 @@
 
 
 #define WATERSIZE 512
-#define DAMP 20
+#define DAMP 175
 
 
 static GLuint texname;
@@ -476,12 +476,25 @@ int delay = 50;
 void 
 idle(void)
 {
+	int i = 0, j = 0;
 	
 	if(!(++num %delay)) {
-		water[f][rand()%WATERSIZE][rand()%WATERSIZE] = -rand()%50+10;
-		delay = rand()%100 + 100;
+		for(i=0;i<WATERSIZE/100;i++)
+			for(j=0;j<WATERSIZE;j++)
+			{
+				water[f][i][j] = -1;
+			}	
+		
+		for(i=0;i<WATERSIZE;i++)
+			for(j=0;j<WATERSIZE/100;j++)
+			{
+				water[f][i][j] = -1;
+			}	
+
 	}
-	glutPostRedisplay();
+	delay = 50;
+	
+glutPostRedisplay();
 }
 
 void

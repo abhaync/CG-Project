@@ -60,9 +60,11 @@ bullet* create_bullet(float posx, float posy)
 	bul = new (bullet);
 	bul->spx = posx;
 	bul->spy = posy;
-	bul->spawn = true;
+	bul->spawn = false;
 	return bul;
 }
+
+bullet *b1,*b2;
 /************************************************************************
   Window
  ************************************************************************/
@@ -290,8 +292,9 @@ void keyOperations()
 	}
 	if(keyStates['i'])
 	{
+		b2 = create_bullet(-5+ga,-5);
 		fire_b2();
-		//f1+=0.3;
+		f1+=0.3;
 	}
 }
 
@@ -460,43 +463,54 @@ void fire_b1()
 
 void fire_b2()
 {
-	bullet *b2 = create_bullet(-5+g,-5);
-	if(!is_spawn(b2))
+	
+	if(b2->spawn)
 	{
 		printf("%f\n",f1 );
-		if(f1 >= 5)
+		if(f1 > 5)
 		{
 			keyStates['i'] = false;
 			f1 = 0;
+			b2->spawn = false;
 		}
-		else
-		{
-			f1 += 0.3;
-		}
+		glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		
+	 		glRotatef(90,0,1,0);
+	 		
+
+		glPopMatrix();
+		b2->spawn = false;
+		// else
+		// {
+		// 	f1 += 0.3;
+		// }
 
 	}
 	else
 	{
+		printf("%f\n",f1 );
+		b2->spawn = true;
 		glDisable(GL_LIGHTING);
 	 	glDisable(GL_LIGHT0);
 	 	glPushMatrix();	
 	 		gluLookAt(0,0,100,0,0,0,0,1,0);
-	 		glTranslatef(-10,-5+f1,-f1);
+	 		glTranslatef(-10,-5+f1,0);
 	 		glRotatef(90,0,1,0);
 			glColor3f(1.0,0.0,0.0);
 	 		glBegin(GL_POINTS);
-				glVertex3f(0,b2->spx,b2->spy);
+				glVertex3f(0,b2->spy,b2->spx);
 			glEnd();
 			glPointSize(5.0);
 		glPopMatrix();
-		b2->spawn = false;
-	}
-	glPushMatrix();	
-	 		gluLookAt(0,0,100,0,0,0,0,1,0);
-	 		//glRotatef(90,0,1,0);
-	 		
+		if(f1 > 15)
+		{
+			f1 = 0;
+			keyStates['i'] = false;
 
-	glPopMatrix();
+		}
+	}
+	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	// if(f1 >= 10)
