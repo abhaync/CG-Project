@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -25,6 +26,10 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "water-tex.h"
 
  
@@ -602,6 +607,10 @@ void keyboardup ( unsigned char key, int x, int y )
 
 int main(int argc, char **argv) 
 {
+	cout<<argv[1]<<endl;
+	int fd = open("highscores.txt", O_WRONLY|O_APPEND);
+	write(fd, strcat(argv[1], "\n"), strlen(argv[1]) + 1);
+	close(fd);
 	// set window values
 	win.width = 512;
 	win.height = 512;
