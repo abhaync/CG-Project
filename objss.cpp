@@ -278,7 +278,7 @@ void keyOperations()
 	{
 		fa-=0.43;
 		fb-=0.4773;
-		g1-=0.5;
+		g1-=0.475;
 		posShip1--;
 		printf("pos1 value: %d\n", posShip1);
 	}
@@ -506,9 +506,15 @@ void isHit1() {
 
 void isHit2() {
 	printf("abs values: %d and %d\n", posShip1, posShip2);
+	float diff = posShip1 - posShip2;
 	//int diff = posShip2 - 115;
-	if(posShip1 < posShip2)
-		if (posShip1 + 100 < (posShip2 + 110) && posShip1 + 100 > posShip2 ) {
+	//if(posShip1 < posShip2)
+		if (diff < 110 && posShip1 - 60 < (posShip2 + 115) && posShip1 - 60 > posShip2 ) {
+			printf("Hit!!!\n");
+			reduceHealthBar2();
+		}
+		else if(diff < 60 && diff > -22 && posShip1 - 60 < (posShip2 + 115))
+		{
 			printf("Hit!!!\n");
 			reduceHealthBar2();
 		}
@@ -548,7 +554,7 @@ void fire_b1()
 	 	glDisable(GL_LIGHT0);
 	 	glPushMatrix();	
 	 		gluLookAt(0,0,100,0,0,0,0,1,0);
-	 		glTranslatef(-10,5-f2,0);
+	 		glTranslatef(-5,7-f2,0);
 	 		glRotatef(90,0,1,0);
 			glColor3f(1.0,0.0,0.0);
 	 		glBegin(GL_POINTS);
@@ -556,7 +562,7 @@ void fire_b1()
 			glEnd();
 			glPointSize(5.0);
 		glPopMatrix();
-		if(f2 > 20)
+		if(f2 > 15)
 		{
 			isHit2();
 			f2 = 0;
