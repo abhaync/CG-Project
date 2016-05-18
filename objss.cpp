@@ -39,8 +39,8 @@
  
 using namespace std;
 float norm[3];
-GLfloat fa=0,g=0,ga=0,fb=0,g2=-5;
-float f1 = 0;
+GLfloat fa=0,g=0,ga=0,fb=0, g2=-5;
+float f1 = 0, f2 = 0;
 bool* keyStates = new bool[256]; 
 void fire_b1();
 void fire_b2();
@@ -306,8 +306,9 @@ void keyOperations()
 	}
 	if(keyStates['w'])
 	{
-
+		b1 = create_bullet(-5,-5);
 		fire_b1();
+		f2 += 0.3;
 	}
 	if(keyStates['i'])
 	{
@@ -480,8 +481,19 @@ void reduceHealthBar1() {
 	glutPostRedisplay();
 }
 
-void isHit() {
-	printf("abs values: %d asdasd %d\n", posShip1, posShip2);
+
+void reduceHealthBar2() {
+	fullHealth2 -= 10;
+	if (fullHealth2 < 0)
+	{
+		printf("player - 2 won!!\n");
+		exit(0);
+	}
+	glutPostRedisplay();
+}
+
+void isHit1() {
+	printf("abs values: %d and %d\n", posShip1, posShip2);
 	//int diff = posShip2 - 115;
 	if(posShip1 > posShip2)
 		if (posShip2 + 58 < (posShip1 + 110) && posShip2 + 58 > posShip1 ) {
@@ -490,15 +502,68 @@ void isHit() {
 		}
 }
 
+void isHit2() {
+	printf("abs values: %d and %d\n", posShip1, posShip2);
+	//int diff = posShip2 - 115;
+	// if(posShip1 > posShip2)
+	// 	if (posShip2 + 58 < (posShip1 + 110) && posShip2 + 58 > posShip1 ) {
+	// 		printf("Hit!!!\n");
+	// 		reduceHealthBar2();
+	// 	}
+}
+
+
 void fire_b1()
 {
-	glColor3f(1.0,0.0,0.0);
-	glPushMatrix();
-		//gluLookAt(0,0,300,0,0,0,0,1,0);
-		glScalef(0.05,0.05,0.05);
-		glutSolidSphere(1,100,100);
-	glPopMatrix();
-} 
+		
+	if(b1->spawn)
+	{
+		// printf("f2 value: %f\n",f2 );
+		if(f2 > 50)
+		{
+			keyStates['w'] = false;
+			f2 = 0;
+			b1->spawn = false;
+		}
+		glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		
+	 		glRotatef(90,0,1,0);
+	 		
+
+		glPopMatrix();
+		b1->spawn = false;
+		// else
+		// {
+		// 	f2 += 0.3;
+		// }
+	}
+	else
+	{
+		// printf("%f\n",f2 );
+		b1->spawn = true;
+		glDisable(GL_LIGHTING);
+	 	glDisable(GL_LIGHT0);
+	 	glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		glTranslatef(-10,5-f2,0);
+	 		glRotatef(90,0,1,0);
+			glColor3f(1.0,0.0,0.0);
+	 		glBegin(GL_POINTS);
+				glVertex3f(0,b1->spy,b1->spx);
+			glEnd();
+			glPointSize(5.0);
+		glPopMatrix();
+		if(f2 > 15)
+		{
+			isHit2();
+			f2 = 0;
+			keyStates['w'] = false;
+		}
+	}
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+}
 
 void fire_b2()
 {
@@ -524,7 +589,6 @@ void fire_b2()
 		// {
 		// 	f1 += 0.3;
 		// }
-
 	}
 	else
 	{
@@ -544,41 +608,13 @@ void fire_b2()
 		glPopMatrix();
 		if(f1 > 15)
 		{
-			isHit();
+			isHit1();
 			f1 = 0;
 			keyStates['i'] = false;
 		}
 	}
-	
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	// if(f1 >= 10)
-	// {
-	// 	keyStates['i'] = false;
-	// 	f1 = 0;
-	// }
-	// else
-	// {	
-	// 	glDisable(GL_LIGHTING);
-	// 	glDisable(GL_LIGHT0);
-	// 	// int i=0,j=0,k=0;
-	// 	glPushMatrix();	
-	// 		gluLookAt(0,0,100,0,0,0,0,1,0);
-	// 		// for(f1=0;f1<10;f1+=0.1)
-	// 		glTranslatef(-10,-5+f1,-f1);
-	// 		glRotatef(90,0,1,0);
-	// 		glColor3f(1.0,0.0,0.0);
-	// 		glBegin(GL_POINTS);
-	// 			glVertex3f(0,0, 0+g);
-	// 			//glVertex3f(0,7, 0);
-	// 			//glVertex3f(0,7, 25);
-	// 			//glVertex3f(0,0, 25);
-	// 		glEnd();
-	// 		glPointSize(5.0);
-	// 	glPopMatrix();
-	// 	glEnable(GL_LIGHTING);
-	// 	glEnable(GL_LIGHT0);
-	// }	
 }
 
 
