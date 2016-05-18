@@ -8,7 +8,7 @@
 
 int screenHeight = 0;
 int screenWidth = 0;
-char *title = "<Project_Name>";
+char *title = "BATTLE OF SHIPS";
 char *centreText = "Press Enter to begin";
 char *devBy = "Developed By:";
 char *names = "Abhay & Sandeep";
