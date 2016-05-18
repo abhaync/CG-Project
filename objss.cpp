@@ -44,6 +44,10 @@ float f1 = 0;
 bool* keyStates = new bool[256]; 
 void fire_b1();
 void fire_b2();
+int posShip1 = 400;
+int posShip2 = 115;
+int fullHealth1 = 75;
+int fullHealth2 = 75;
 
 typedef struct bullet
 {
@@ -274,21 +278,29 @@ void keyOperations()
 	{
 		fa-=0.2;
 		fb-=0.222;
+		posShip1--;
+		printf("pos1 value: %d\n", posShip1);
 	}
 	if(keyStates['d'])
 	{
 		fa+=0.2;
 		fb+=0.222;
+		posShip1++;
+		printf("pos1 value: %d\n", posShip1);
 	}	
 	if(keyStates['j'])
 	{
 		g-=0.2;
 		ga-=0.275;
+		posShip2--;
+		printf("pos2 value: %d\n", posShip2);
 	}
 	if(keyStates['l'])
 	{
 		g+=0.2;
 		ga+=0.275;
+		posShip2++;
+		printf("pos2 value: %d\n", posShip2);
 	}
 	if(keyStates['w'])
 	{
@@ -383,8 +395,8 @@ void display()
 		glTranslatef(0, 67, -10);
 		glBegin(GL_QUADS);
 			glVertex2f(0, 0);
-			glVertex2f(75, 0);
-			glVertex2f(75, 10);
+			glVertex2f(fullHealth1, 0);
+			glVertex2f(fullHealth1, 10);
 			glVertex2f(0, 10);
 		glEnd();
 	glPopMatrix();
@@ -393,8 +405,8 @@ void display()
 		glTranslatef(-90,60, 0);
 		glBegin(GL_QUADS);
 			glVertex2f(0, 0);
-			glVertex2f(75, 0);
-			glVertex2f(75, 10);
+			glVertex2f(fullHealth2, 0);
+			glVertex2f(fullHealth2, 10);
 			glVertex2f(0, 10);
 		glEnd();
 		/*glTranslatef(30.0,0.0,75.0);
@@ -456,6 +468,25 @@ void display()
 
 }
 
+void reduceHealthBar1() {
+	fullHealth1 -= 10;
+	if (fullHealth1 < 0)
+	{
+		printf("player - 2 won!!\n");
+		exit(0);
+	}
+	glutPostRedisplay();
+}
+
+void isHit() {
+	printf("abs values: %d asdasd %d\n", posShip1, posShip2);
+	int diff = posShip2 - 115;
+	if (posShip1 < 376 + diff && posShip1 > 266 + diff ) {
+		printf("Hit!!!\n");
+		reduceHealthBar1();
+	}
+}
+
 void fire_b1()
 {
 	glColor3f(1.0,0.0,0.0);
@@ -471,8 +502,8 @@ void fire_b2()
 	
 	if(b2->spawn)
 	{
-		printf("%f\n",f1 );
-		if(f1 > 5)
+		// printf("f1 value: %f\n",f1 );
+		if(f1 > 50)
 		{
 			keyStates['i'] = false;
 			f1 = 0;
@@ -494,7 +525,7 @@ void fire_b2()
 	}
 	else
 	{
-		printf("%f\n",f1 );
+		// printf("%f\n",f1 );
 		b2->spawn = true;
 		glDisable(GL_LIGHTING);
 	 	glDisable(GL_LIGHT0);
@@ -510,9 +541,9 @@ void fire_b2()
 		glPopMatrix();
 		if(f1 > 15)
 		{
+			isHit();
 			f1 = 0;
 			keyStates['i'] = false;
-
 		}
 	}
 	
@@ -545,8 +576,9 @@ void fire_b2()
 	// 	glEnable(GL_LIGHTING);
 	// 	glEnable(GL_LIGHT0);
 	// }	
-
 }
+
+
  
 void initialize () 
 {
