@@ -44,7 +44,7 @@ float f1 = 0;
 bool* keyStates = new bool[256]; 
 void fire_b1();
 void fire_b2();
-int posShip1 = 400;
+int posShip1 = 185;
 int posShip2 = 115;
 int fullHealth1 = 75;
 int fullHealth2 = 75;
@@ -276,15 +276,15 @@ void keyOperations()
 {
 	if(keyStates['a'])
 	{
-		fa-=0.2;
-		fb-=0.222;
+		fa-=0.43;
+		fb-=0.4773;
 		posShip1--;
 		printf("pos1 value: %d\n", posShip1);
 	}
 	if(keyStates['d'])
 	{
-		fa+=0.2;
-		fb+=0.222;
+		fa+=0.43;
+		fb+=0.4773;
 		posShip1++;
 		printf("pos1 value: %d\n", posShip1);
 	}	
@@ -482,11 +482,12 @@ void reduceHealthBar1() {
 
 void isHit() {
 	printf("abs values: %d asdasd %d\n", posShip1, posShip2);
-	int diff = posShip2 - 115;
-	if (posShip1 < 380 + diff && posShip1 > 265 + diff ) {
-		printf("Hit!!!\n");
-		reduceHealthBar1();
-	}
+	//int diff = posShip2 - 115;
+	if(posShip1 > posShip2)
+		if (posShip2 + 58 < (posShip1 + 110) && posShip2 + 58 > posShip1 ) {
+			printf("Hit!!!\n");
+			reduceHealthBar1();
+		}
 }
 
 void fire_b1()
