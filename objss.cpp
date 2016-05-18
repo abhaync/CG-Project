@@ -39,7 +39,7 @@
  
 using namespace std;
 float norm[3];
-GLfloat fa=0,g=0,ga=0,fb=0, g2=-5;
+GLfloat fa=0,g=0,ga=0,fb=0, g2=-5, g1=5;
 float f1 = 0, f2 = 0;
 bool* keyStates = new bool[256]; 
 void fire_b1();
@@ -278,6 +278,7 @@ void keyOperations()
 	{
 		fa-=0.43;
 		fb-=0.4773;
+		g1-=0.5;
 		posShip1--;
 		printf("pos1 value: %d\n", posShip1);
 	}
@@ -285,6 +286,7 @@ void keyOperations()
 	{
 		fa+=0.43;
 		fb+=0.4773;
+		g1+=0.5;	
 		posShip1++;
 		printf("pos1 value: %d\n", posShip1);
 	}	
@@ -306,7 +308,7 @@ void keyOperations()
 	}
 	if(keyStates['w'])
 	{
-		b1 = create_bullet(-5,-5);
+		b1 = create_bullet(g1,-5);
 		fire_b1();
 		f2 += 0.3;
 	}
@@ -486,7 +488,7 @@ void reduceHealthBar2() {
 	fullHealth2 -= 10;
 	if (fullHealth2 < 0)
 	{
-		printf("player - 2 won!!\n");
+		printf("player - 1 won!!\n");
 		exit(0);
 	}
 	glutPostRedisplay();
@@ -505,11 +507,11 @@ void isHit1() {
 void isHit2() {
 	printf("abs values: %d and %d\n", posShip1, posShip2);
 	//int diff = posShip2 - 115;
-	// if(posShip1 > posShip2)
-	// 	if (posShip2 + 58 < (posShip1 + 110) && posShip2 + 58 > posShip1 ) {
-	// 		printf("Hit!!!\n");
-	// 		reduceHealthBar2();
-	// 	}
+	if(posShip1 < posShip2)
+		if (posShip1 + 100 < (posShip2 + 110) && posShip1 + 100 > posShip2 ) {
+			printf("Hit!!!\n");
+			reduceHealthBar2();
+		}
 }
 
 
@@ -554,7 +556,7 @@ void fire_b1()
 			glEnd();
 			glPointSize(5.0);
 		glPopMatrix();
-		if(f2 > 15)
+		if(f2 > 20)
 		{
 			isHit2();
 			f2 = 0;
