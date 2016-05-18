@@ -45,6 +45,7 @@ bool* keyStates = new bool[256];
 void fire_b1();
 void fire_b2();
 int posShip1 = 185;
+int totalHits1 = 0, totalHits2 = 0, hits1 = 0, hits2 = 0, miss1=0, miss2= 0;
 int posShip2 = 115;
 int fullHealth1 = 75;
 int fullHealth2 = 75;
@@ -308,12 +309,14 @@ void keyOperations()
 	}
 	if(keyStates['w'])
 	{
+		totalHits2++;
 		b1 = create_bullet(g1,-5);
 		fire_b1();
 		f2 += 0.3;
 	}
 	if(keyStates['i'])
 	{
+		totalHits1++;
 		b2 = create_bullet(g2,-5);
 		fire_b2();
 		f1+=0.3;
@@ -477,7 +480,8 @@ void reduceHealthBar1() {
 	fullHealth1 -= 10;
 	if (fullHealth1 < 0)
 	{
-		printf("player - 2 won!!\n");
+		int score2 = (hits1*100)-(miss1*10);
+		printf("player - 2 won!!with a score %f\n", (float)score2);
 		exit(0);
 	}
 	glutPostRedisplay();
@@ -488,7 +492,8 @@ void reduceHealthBar2() {
 	fullHealth2 -= 10;
 	if (fullHealth2 < 0)
 	{
-		printf("player - 1 won!!\n");
+		int score2 = (hits2*100)-(miss2*10);
+		printf("player - 1 won!! with a score %f\n",(float)score2);
 		exit(0);
 	}
 	glutPostRedisplay();
@@ -497,11 +502,15 @@ void reduceHealthBar2() {
 void isHit1() {
 	printf("abs values: %d and %d\n", posShip1, posShip2);
 	//int diff = posShip2 - 115;
-	if(posShip1 > posShip2)
+	if(posShip1 > posShip2) {
 		if (posShip2 + 58 < (posShip1 + 110) && posShip2 + 58 > posShip1 ) {
 			printf("Hit!!!\n");
+			hits1++;
 			reduceHealthBar1();
+		} else {
+			miss1++;
 		}
+	}
 }
 
 void isHit2() {
@@ -516,7 +525,10 @@ void isHit2() {
 		else if(diff < 60 && diff > -22 && posShip1 - 60 < (posShip2 + 115))
 		{
 			printf("Hit!!!\n");
+			hits2++;
 			reduceHealthBar2();
+		} else {
+			miss2++;
 		}
 }
 
