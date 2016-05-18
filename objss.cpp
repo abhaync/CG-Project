@@ -39,7 +39,7 @@
  
 using namespace std;
 float norm[3];
-GLfloat fa=0,g=0,ga=0,fb=0;
+GLfloat fa=0,g=0,ga=0,fb=0,g2=-5;
 float f1 = 0;
 bool* keyStates = new bool[256]; 
 void fire_b1();
@@ -73,7 +73,7 @@ bullet* create_bullet(float posx, float posy)
 	return bul;
 }
 
-bullet *b1,*b2;
+bullet *b1 = NULL,*b2 = NULL;
 /************************************************************************
   Window
  ************************************************************************/
@@ -292,6 +292,7 @@ void keyOperations()
 	{
 		g-=0.2;
 		ga-=0.275;
+		g2-=0.5;
 		posShip2--;
 		printf("pos2 value: %d\n", posShip2);
 	}
@@ -299,6 +300,7 @@ void keyOperations()
 	{
 		g+=0.2;
 		ga+=0.275;
+		g2+=0.5;
 		posShip2++;
 		printf("pos2 value: %d\n", posShip2);
 	}
@@ -309,7 +311,7 @@ void keyOperations()
 	}
 	if(keyStates['i'])
 	{
-		b2 = create_bullet(-5+ga,-5);
+		b2 = create_bullet(g2,-5);
 		fire_b2();
 		f1+=0.3;
 	}
@@ -481,7 +483,7 @@ void reduceHealthBar1() {
 void isHit() {
 	printf("abs values: %d asdasd %d\n", posShip1, posShip2);
 	int diff = posShip2 - 115;
-	if (posShip1 < 376 + diff && posShip1 > 266 + diff ) {
+	if (posShip1 < 380 + diff && posShip1 > 265 + diff ) {
 		printf("Hit!!!\n");
 		reduceHealthBar1();
 	}
@@ -619,7 +621,19 @@ void keyboard ( unsigned char key, int x, int y )
   if(key == KEY_ESCAPE)
 	exit(0);
   else
+  {
 	keyStates[key] = true;
+	if(keyStates['i'])
+	{
+		keyStates['j'] = false;
+		keyStates['l'] = false;
+	}
+	if(keyStates['w'])
+	{
+		keyStates['a'] = false;
+		keyStates['d'] = false;
+	}
+  }	
   //glutPostRedisplay();
 }
 
