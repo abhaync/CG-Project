@@ -1,17 +1,3 @@
-/*
- *
- * Demonstrates how to load and display an Wavefront OBJ file. 
- * Using triangles and normals as static object. No texture mapping.
- * https://tutorialsplay.com/opengl/
- *
- * OBJ files must be triangulated!!!
- * Non triangulated objects wont work!
- * You can use Blender to triangulate
- *
- * g++ obj.c -lglut -lGL -lGLU -lSDL -lSDL_image -fpermissive
- *
- */
- 
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -38,6 +24,7 @@
  int displayFlag = 0;
  
 using namespace std;
+
 float norm[3];
 GLfloat fa=0,g=0,ga=0,fb=0, g2=-5, g1=5;
 float f1 = 0, f2 = 0;
@@ -49,6 +36,7 @@ int totalHits1 = 0, totalHits2 = 0, hits1 = 0, hits2 = 0, miss1=0, miss2= 0;
 int posShip2 = 115;
 int fullHealth1 = 75;
 int fullHealth2 = 75;
+char *player1, *player2;
 
 typedef struct bullet
 {
@@ -395,7 +383,6 @@ void display()
 
 
 	glPopMatrix();
-
 	keyOperations();
 	glColor3f(0.0, 1.0, 0.0);
 	glPushMatrix();
@@ -417,9 +404,6 @@ void display()
 			glVertex2f(fullHealth2, 10);
 			glVertex2f(0, 10);
 		glEnd();
-		/*glTranslatef(30.0,0.0,75.0);
-		glScalef(10.0,0.25,0.0);
-		glutWireCube(2.0);*/
 	glPopMatrix();
 	glColor3f(0.0,1.0,0.0);
 	glPushMatrix();
@@ -461,15 +445,11 @@ void display()
 	glColor3f(0.0, 1.0, 1.0);
 	glPushMatrix();
 		gluLookAt( 0,0,100, 0,0,0, 0,1,0);
-		//glRotatef(30,0,1,0);
 		glRotatef(90,0,1,0);
 		glTranslatef(0,10,6);
 		glScalef(1,1,1);
 		glTranslatef(0,0,fa);
-	//	g_rotation++;
-		obj1.Draw();
-		
-		
+		obj1.Draw();		
 	glPopMatrix();
 	glutSwapBuffers();
 	glFlush();
@@ -477,11 +457,14 @@ void display()
 }
 
 void reduceHealthBar1() {
-	fullHealth1 -= 10;
+	fullHealth1 -= 30;
 	if (fullHealth1 < 0)
 	{
 		int score2 = (hits1*100)-(miss1*10);
 		printf("player - 2 won!!with a score %f\n", (float)score2);
+		FILE *fp = fopen("highscores.txt", "a+");
+		fprintf(fp, "%s:\t%f\n", player2, (float)score2);
+		fclose(fp);
 		exit(0);
 	}
 	glutPostRedisplay();
@@ -489,11 +472,14 @@ void reduceHealthBar1() {
 
 
 void reduceHealthBar2() {
-	fullHealth2 -= 10;
+	fullHealth2 -= 30;
 	if (fullHealth2 < 0)
 	{
 		int score2 = (hits2*100)-(miss2*10);
 		printf("player - 1 won!! with a score %f\n",(float)score2);
+		FILE *fp = fopen("highscores.txt", "a+");
+		fprintf(fp, "%s:\t%f\n", player1, (float)score2);
+		fclose(fp);
 		exit(0);
 	}
 	glutPostRedisplay();
@@ -605,10 +591,6 @@ void fire_b2()
 
 		glPopMatrix();
 		b2->spawn = false;
-		// else
-		// {
-		// 	f1 += 0.3;
-		// }
 	}
 	else
 	{
@@ -691,7 +673,6 @@ void keyboard ( unsigned char key, int x, int y )
 		keyStates['d'] = false;
 	}
   }	
-  //glutPostRedisplay();
 }
 
 void keyboardup ( unsigned char key, int x, int y )
@@ -702,22 +683,14 @@ void keyboardup ( unsigned char key, int x, int y )
 		keyStates[key] = false;
 }
 
-/*void idle()
-{
-	water[f][WATERSIZE/2][WATERSIZE/2] = -50;
- 	glutPostRedisplay();
-}*/
-
 int main(int argc, char **argv) 
 {
-	cout<<argv[1]<<endl;
-	int fd = open("highscores.txt", O_WRONLY|O_APPEND);
-	write(fd, strcat(argv[1], "\n"), strlen(argv[1]) + 1);
-	close(fd);
+	player1 = argv[1];
+	player2 = argv[2];
 	// set window values
 	win.width = 512;
 	win.height = 512;
-	win.title = "OpenGL/GLUT OBJ Loader.";
+	win.title = "Battle Of Ships";
 	win.field_of_view_angle = 45;
 	win.z_near = 1.0f;
 	win.z_far = 500.0f;
