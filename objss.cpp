@@ -269,7 +269,6 @@ void keyOperations()
 		fb-=0.4773;
 		g1-=0.475;
 		posShip1--;
-		printf("pos1 value: %d\n", posShip1);
 	}
 	if(keyStates['d'])
 	{
@@ -277,7 +276,6 @@ void keyOperations()
 		fb+=0.4773;
 		g1+=0.5;	
 		posShip1++;
-		printf("pos1 value: %d\n", posShip1);
 	}	
 	if(keyStates['j'])
 	{
@@ -285,7 +283,6 @@ void keyOperations()
 		ga-=0.275;
 		g2-=0.5;
 		posShip2--;
-		printf("pos2 value: %d\n", posShip2);
 	}
 	if(keyStates['l'])
 	{
@@ -293,7 +290,6 @@ void keyOperations()
 		ga+=0.275;
 		g2+=0.5;
 		posShip2++;
-		printf("pos2 value: %d\n", posShip2);
 	}
 	if(keyStates['w'])
 	{
@@ -359,8 +355,6 @@ void display()
 		for(j = 0; j < WATERSIZE-1; j++) {
 			tx = (float)j/WATERSIZE;
 			ty = (float)i/WATERSIZE;
-			//texd = (float)1/WATERSIZE;
-
 			glTexCoord2f(tx, ty); 
 			glVertex3f(j-WATERSIZE/2, i-WATERSIZE/2, water[t][j][i]);
 			glTexCoord2f(tx+texd, ty); 
