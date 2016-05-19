@@ -18,7 +18,6 @@
 #include <sys/stat.h>
 #include "water-tex.h"
 
- 
 #define KEY_ESCAPE 27
 
  int displayFlag = 0;
@@ -451,7 +450,7 @@ void display()
 }
 
 void reduceHealthBar1() {
-	fullHealth1 -= 30;
+	fullHealth1 -= 10;
 	if (fullHealth1 < 0)
 	{
 		int score2 = (hits1*100)-(miss1*10);
@@ -466,7 +465,7 @@ void reduceHealthBar1() {
 
 
 void reduceHealthBar2() {
-	fullHealth2 -= 30;
+	fullHealth2 -= 10;
 	if (fullHealth2 < 0)
 	{
 		int score2 = (hits2*100)-(miss2*10);
