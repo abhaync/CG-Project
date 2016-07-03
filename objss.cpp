@@ -500,6 +500,7 @@ void isHit2() {
 		if (diff < 110 && posShip1 - 60 < (posShip2 + 115) && posShip1 - 60 > posShip2 ) {
 			printf("Hit!!!\n");
 			reduceHealthBar2();
+			hits2++;
 		}
 		else if(diff < 60 && diff > -22 && posShip1 - 60 < (posShip2 + 115))
 		{

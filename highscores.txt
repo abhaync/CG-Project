@@ -1,4 +1,6 @@
-New
-new_player
-abcd
-player1
+ijklk:	300.000000
+player:	300.000000
+player2:	300.000000
+abcd:	0.000000
+asdas:	700.000000
+arunabh:	690.000000
