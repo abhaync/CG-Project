@@ -1,20 +1,7 @@
-/*
- *
- * Demonstrates how to load and display an Wavefront OBJ file. 
- * Using triangles and normals as static object. No texture mapping.
- * https://tutorialsplay.com/opengl/
- *
- * OBJ files must be triangulated!!!
- * Non triangulated objects wont work!
- * You can use Blender to triangulate
- *
- * g++ obj.c -lglut -lGL -lGLU -lSDL -lSDL_image -fpermissive
- *
- */
- 
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -25,13 +12,56 @@
 #include <string>
 #include <vector>
 #include <cmath>
- 
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include "water-tex.h"
+
 #define KEY_ESCAPE 27
+
+ int displayFlag = 0;
  
 using namespace std;
+
 float norm[3];
-GLfloat f=0,g=0;
+GLfloat fa=0,g=0,ga=0,fb=0, g2=-5, g1=5;
+float f1 = 0, f2 = 0;
 bool* keyStates = new bool[256]; 
+void fire_b1();
+void fire_b2();
+int posShip1 = 185;
+int totalHits1 = 0, totalHits2 = 0, hits1 = 0, hits2 = 0, miss1=0, miss2= 0;
+int posShip2 = 115;
+int fullHealth1 = 75;
+int fullHealth2 = 75;
+char *player1, *player2;
+
+typedef struct bullet
+{
+	bool spawn;
+	float spx,spy;
+};
+
+bool is_spawn(bullet *b)
+{
+	if(b->spawn)
+		return true;
+	else
+		return false;
+}
+
+bullet* create_bullet(float posx, float posy)
+{
+	bullet *bul;
+	bul = new (bullet);
+	bul->spx = posx;
+	bul->spy = posy;
+	bul->spawn = false;
+	return bul;
+}
+
+bullet *b1 = NULL,*b2 = NULL;
 /************************************************************************
   Window
  ************************************************************************/
@@ -233,13 +263,74 @@ glutWindow win;
 void keyOperations()
 {
 	if(keyStates['a'])
-		f-=0.2;
+	{
+		fa-=0.43;
+		fb-=0.4773;
+		g1-=0.475;
+		posShip1--;
+	}
 	if(keyStates['d'])
-		f+=0.2;
+	{
+		fa+=0.43;
+		fb+=0.4773;
+		g1+=0.5;	
+		posShip1++;
+	}	
 	if(keyStates['j'])
+	{
 		g-=0.2;
+		ga-=0.275;
+		g2-=0.5;
+		posShip2--;
+	}
 	if(keyStates['l'])
+	{
 		g+=0.2;
+		ga+=0.275;
+		g2+=0.5;
+		posShip2++;
+	}
+	if(keyStates['w'])
+	{
+		totalHits2++;
+		b1 = create_bullet(g1,-5);
+		fire_b1();
+		f2 += 0.3;
+	}
+	if(keyStates['i'])
+	{
+		totalHits1++;
+		b2 = create_bullet(g2,-5);
+		fire_b2();
+		f1+=0.3;
+	}
+}
+
+void loadBackgroundImage(char *image) {
+	char *imageData;
+	FILE *file;
+	int width = 1920;
+	int height = 1080;
+	file = fopen(image, "r");
+	imageData = (char*) malloc(width * height * 24);
+	int imageSize = width * height * 24;
+	fread(imageData, width * height * 4, 1, file);
+	fclose(file);
+	 /*
+	 * TGA is stored in BGR (Blue-Green-Red) format,
+	 * we need to convert this to Red-Green-Blue (RGB).
+	 * The following section does BGR to RGB conversion
+	 */
+	for (int i = 0; i < imageSize; i+=3) {
+		// 24 bits per pixel   =  3 byte per pixel
+		char c = imageData[i];
+		imageData[i] = imageData[i+2];
+		imageData[i+2] = c;
+	}
+	glRasterPos2i(0,0);
+	glPixelStorei (GL_UNPACK_ROW_LENGTH, width);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, imageData);
 }
 
 GLuint LoadTexture( const char * filename )
@@ -295,33 +386,283 @@ void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	keyOperations();
+	int i, j, tmp;
+	float tx, ty;
+	float texd = (float)1/WATERSIZE;		/* for texture mapping */
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glPushMatrix();
-		gluLookAt( 12,-1,40, 0,0,0, 0,1,0);
-		glRotatef(45,0,1,0);
+	glTranslatef(0, 0, spin_z-110);
+	glRotatef(spin_x, 0, 1, 0);
+	glRotatef(spin_y-60, 1, 0, 0);
+
+	calcwater();
+	glBegin(GL_TRIANGLES);
+	for(i = 0; i < WATERSIZE-1; i++) {
+		for(j = 0; j < WATERSIZE-1; j++) {
+			tx = (float)j/WATERSIZE;
+			ty = (float)i/WATERSIZE;
+			glTexCoord2f(tx, ty); 
+			glVertex3f(j-WATERSIZE/2, i-WATERSIZE/2, water[t][j][i]);
+			glTexCoord2f(tx+texd, ty); 
+			glVertex3f(j+1-WATERSIZE/2, i-WATERSIZE/2, water[t][j+1][i]);
+			glTexCoord2f(tx+texd, ty+texd); 
+			glVertex3f(j+1-WATERSIZE/2, i+1-WATERSIZE/2, water[t][j+1][i+1]);
+
+			glTexCoord2f(tx, ty+texd); 
+			glVertex3f(j-WATERSIZE/2, i+1-WATERSIZE/2, water[t][j][i+1]);
+			glTexCoord2f(tx, ty); 
+			glVertex3f(j-WATERSIZE/2, i-WATERSIZE/2, water[t][j][i]);
+			glTexCoord2f(tx+texd, ty+texd); 
+			glVertex3f(j+1-WATERSIZE/2, i+1-WATERSIZE/2, water[t][j+1][i+1]);
+
+		}
+	}
+	glEnd();
+
+	tmp = t; t = f; f = tmp;
+
+
+	glPopMatrix();
+	keyOperations();
+	glColor3f(0.0, 1.0, 0.0);
+	glPushMatrix();
+		gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 0);
+		glTranslatef(0, 67, -10);
+		glBegin(GL_QUADS);
+			glVertex2f(0, 0);
+			glVertex2f(fullHealth1, 0);
+			glVertex2f(fullHealth1, 10);
+			glVertex2f(0, 10);
+		glEnd();
+	glPopMatrix();
+	glPushMatrix();
+		gluLookAt(0, 0, 100, 0, 0, 0, 0, 1, 0);
+		glTranslatef(-90,60, 0);
+		glBegin(GL_QUADS);
+			glVertex2f(0, 0);
+			glVertex2f(fullHealth2, 0);
+			glVertex2f(fullHealth2, 10);
+			glVertex2f(0, 10);
+		glEnd();
+	glPopMatrix();
+	glColor3f(0.0,1.0,0.0);
+	glPushMatrix();
+		gluLookAt(0,0,50,0,0,0,0,1,0);
+		glTranslatef(-24+ga,-11,-5);
 		glRotatef(90,0,1,0);
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(0,0, 0);
+			glVertex3f(0,8, 0);
+			glVertex3f(0,8, 30);
+			glVertex3f(0,0, 30);
+		glEnd();
+	glPopMatrix();	
+	glColor3f(1, 0, 0);
+	glPushMatrix();
+		gluLookAt( 0,0,100, 0,0,0, 0,1,0);
+		glRotatef(90,0,1,0);
+		// glRotatef(90,0,1,0);
 		glTranslatef(0,-5,-5);
-		glScalef(0.5,0.5,0.5);
+		glScalef(2, 2, 2);
 		glTranslatef(0,0,g);
 	//	g_rotation++;
 		obj.Draw();
 		
 	glPopMatrix();
+	glColor3f(1,0,0);
 	glPushMatrix();
-		gluLookAt( 15,1,40, 0,0,0, 0,1,0);
-		glRotatef(45,0,1,0);
+		gluLookAt(0,0,100,0,0,0,0,1,0);
+		glTranslatef(-10+fb,5,0);
 		glRotatef(90,0,1,0);
-		glTranslatef(0,6,6);
-		glScalef(0.5,0.5,0.5);
-		glTranslatef(0,0,f);
-	//	g_rotation++;
-		obj1.Draw();
+		glBegin(GL_LINE_LOOP);
+			glVertex3f(0,0, 0);
+			glVertex3f(0,7, 0);
+			glVertex3f(0,7, 25);
+			glVertex3f(0,0, 25);
+		glEnd();
+	glPopMatrix();	
 		
-		
+	glColor3f(0.0, 1.0, 1.0);
+	glPushMatrix();
+		gluLookAt( 0,0,100, 0,0,0, 0,1,0);
+		glRotatef(90,0,1,0);
+		glTranslatef(0,10,6);
+		glScalef(1,1,1);
+		glTranslatef(0,0,fa);
+		obj1.Draw();		
 	glPopMatrix();
 	glutSwapBuffers();
+	glFlush();
+
 }
- 
+
+void reduceHealthBar1() {
+	fullHealth1 -= 10;
+	if (fullHealth1 < 0)
+	{
+		int score2 = (hits1*100)-(miss1*10);
+		printf("player - 2 won!!with a score %f\n", (float)score2);
+		FILE *fp = fopen("highscores.txt", "a+");
+		fprintf(fp, "%s:\t%f\n", player2, (float)score2);
+		fclose(fp);
+		exit(0);
+	}
+	glutPostRedisplay();
+}
+
+
+void reduceHealthBar2() {
+	fullHealth2 -= 10;
+	if (fullHealth2 < 0)
+	{
+		int score2 = (hits2*100)-(miss2*10);
+		printf("player - 1 won!! with a score %f\n",(float)score2);
+		FILE *fp = fopen("highscores.txt", "a+");
+		fprintf(fp, "%s:\t%f\n", player1, (float)score2);
+		fclose(fp);
+		exit(0);
+	}
+	glutPostRedisplay();
+}
+
+void isHit1() {
+	printf("abs values: %d and %d\n", posShip1, posShip2);
+	//int diff = posShip2 - 115;
+	if(posShip1 > posShip2) {
+		if (posShip2 + 58 < (posShip1 + 110) && posShip2 + 58 > posShip1 ) {
+			printf("Hit!!!\n");
+			hits1++;
+			reduceHealthBar1();
+		} else {
+			miss1++;
+		}
+	}
+}
+
+void isHit2() {
+	printf("abs values: %d and %d\n", posShip1, posShip2);
+	float diff = posShip1 - posShip2;
+	//int diff = posShip2 - 115;
+	//if(posShip1 < posShip2)
+		if (diff < 110 && posShip1 - 60 < (posShip2 + 115) && posShip1 - 60 > posShip2 ) {
+			printf("Hit!!!\n");
+			reduceHealthBar2();
+			hits2++;
+		}
+		else if(diff < 60 && diff > -22 && posShip1 - 60 < (posShip2 + 115))
+		{
+			printf("Hit!!!\n");
+			hits2++;
+			reduceHealthBar2();
+		} else {
+			miss2++;
+		}
+}
+
+
+void fire_b1()
+{
+		
+	if(b1->spawn)
+	{
+		// printf("f2 value: %f\n",f2 );
+		if(f2 > 50)
+		{
+			keyStates['w'] = false;
+			f2 = 0;
+			b1->spawn = false;
+		}
+		glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		
+	 		glRotatef(90,0,1,0);
+	 		
+
+		glPopMatrix();
+		b1->spawn = false;
+		// else
+		// {
+		// 	f2 += 0.3;
+		// }
+	}
+	else
+	{
+		// printf("%f\n",f2 );
+		b1->spawn = true;
+		glDisable(GL_LIGHTING);
+	 	glDisable(GL_LIGHT0);
+	 	glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		glTranslatef(-5,7-f2,0);
+	 		glRotatef(90,0,1,0);
+			glColor3f(1.0,0.0,0.0);
+	 		glBegin(GL_POINTS);
+				glVertex3f(0,b1->spy,b1->spx);
+			glEnd();
+			glPointSize(5.0);
+		glPopMatrix();
+		if(f2 > 15)
+		{
+			isHit2();
+			f2 = 0;
+			keyStates['w'] = false;
+		}
+	}
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+}
+
+void fire_b2()
+{
+	
+	if(b2->spawn)
+	{
+		// printf("f1 value: %f\n",f1 );
+		if(f1 > 50)
+		{
+			keyStates['i'] = false;
+			f1 = 0;
+			b2->spawn = false;
+		}
+		glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		
+	 		glRotatef(90,0,1,0);
+	 		
+
+		glPopMatrix();
+		b2->spawn = false;
+	}
+	else
+	{
+		// printf("%f\n",f1 );
+		b2->spawn = true;
+		glDisable(GL_LIGHTING);
+	 	glDisable(GL_LIGHT0);
+	 	glPushMatrix();	
+	 		gluLookAt(0,0,100,0,0,0,0,1,0);
+	 		glTranslatef(-10,-5+f1,0);
+	 		glRotatef(90,0,1,0);
+			glColor3f(1.0,0.0,0.0);
+	 		glBegin(GL_POINTS);
+				glVertex3f(0,b2->spy,b2->spx);
+			glEnd();
+			glPointSize(5.0);
+		glPopMatrix();
+		if(f1 > 15)
+		{
+			isHit1();
+			f1 = 0;
+			keyStates['i'] = false;
+		}
+	}
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+}
+
+
  
 void initialize () 
 {
@@ -330,7 +671,8 @@ void initialize ()
 	GLfloat aspect = (GLfloat) win.width / win.height;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-	gluPerspective(win.field_of_view_angle, aspect, win.z_near, win.z_far);
+	glFrustum(-1.0,1.0,-1.0,1.0,1.0,500.0);
+	//gluPerspective(win.field_of_view_angle, aspect, win.z_near, win.z_far);
     glMatrixMode(GL_MODELVIEW);
     glShadeModel( GL_SMOOTH );
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -361,26 +703,37 @@ void keyboard ( unsigned char key, int x, int y )
   if(key == KEY_ESCAPE)
 	exit(0);
   else
+  {
 	keyStates[key] = true;
-  //glutPostRedisplay();
+	if(keyStates['i'])
+	{
+		keyStates['j'] = false;
+		keyStates['l'] = false;
+	}
+	if(keyStates['w'])
+	{
+		keyStates['a'] = false;
+		keyStates['d'] = false;
+	}
+  }	
 }
 
 void keyboardup ( unsigned char key, int x, int y )
 {
-	keyStates[key] = false;
-}
-
-void idle()
-{
-	glutPostRedisplay();
+	if(key == 'w' || key == 'i')
+		keyStates[key] = true;
+	else
+		keyStates[key] = false;
 }
 
 int main(int argc, char **argv) 
 {
+	player1 = argv[1];
+	player2 = argv[2];
 	// set window values
-	win.width = 640;
-	win.height = 480;
-	win.title = "OpenGL/GLUT OBJ Loader.";
+	win.width = 512;
+	win.height = 512;
+	win.title = "Battle Of Ships";
 	win.field_of_view_angle = 45;
 	win.z_near = 1.0f;
 	win.z_far = 500.0f;
@@ -394,6 +747,7 @@ int main(int argc, char **argv)
 	glutIdleFunc(idle);									// register Idle Function
         glutKeyboardFunc( keyboard );
 	glutKeyboardUpFunc( keyboardup );								// register Keyboard Handler
+	LoadTexture();
 	initialize();
 	obj.Load("absship.obj");
 	obj1.Load("absship.obj");

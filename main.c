@@ -8,15 +8,11 @@
 
 int screenHeight = 0;
 int screenWidth = 0;
-char *title = "<Project_Name>";
+char *title = "BATTLE OF SHIPS";
 char *centreText = "Press Enter to begin";
 char *devBy = "Developed By:";
 char *names = "Abhay & Sandeep";
 
-/* Function Description:
- *
- *
- */
 void initialize() {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	gluOrtho2D(0.0, (float)(screenWidth - 1), 0.0, (float)(screenHeight -1));
@@ -137,11 +133,7 @@ void display() {
 	renderMenu();
 	glFlush();
 }
-	
-/* Function Description:
- *
- *
- */
+
 void mouseClicked(int btn, int state, int x, int y) {
 	float midX = screenWidth / 2;
 	midX = (midX + midX - 1) / 2;
@@ -151,27 +143,37 @@ void mouseClicked(int btn, int state, int x, int y) {
 	int xMax = midX - 145;
 	int yMin = midY - 50;
 	int yMax = midY + 50;
+	char player1Name[50] = "Player1";
+	char player2Name[50] = "Player2";
+	char message[100] = "Enter player name in the teminal window";
+	glRasterPos2i(((screenWidth / 2) - strlen(title)), screenHeight - 100);
+	for (int i = 0; i < strlen(title); i++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, title[i]);
+	}
 	printf("x is :%d and y is :%d\n", x, y);
-	if ((btn == 'q' || btn == 'Q') && state == GLUT_UP) {
-		exit(0);
-	} else if(x > xMin && x < xMax && y > yMin && y < yMax && btn == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+	if(x > xMin && x < xMax && y > yMin && y < yMax && btn == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		// Play button is clicked
 		pid_t gamePid;
+		printf("Enter Player-1 name:   ");
+		scanf("%s",player1Name);
+		printf("Enter Player-2 name:   ");
+		scanf("%s",player2Name);
+		char cmd[100] = "g++ objss.cpp -lglut -lGL -lGLU -o game && ./game ";
+		strcat(cmd, player1Name);
+		strcat(cmd, "  ");
+		strcat(cmd, player2Name);
 		if ((gamePid = fork()) < 0) {
 			printf("Game could not be launched.\n");
 		} else if(gamePid == 0) {
-			printf("Game successfully launched.\n");
-			system("g++ objss.cpp -lglut -lGL -lGLU -o game && ./game");
+			printf("Game successfully compiled.\n");
+			system(cmd);
+			printf("Successfully executed:  %s\n", cmd);
 		} else {
 			exit(0);
 		}
 	}
 }
 
-/* Function Description:
- *
- *
- */
 void keyPressed(unsigned char key, int x, int y) {
 	switch (key) {
 	case 27: // Escape key
